@@ -57,8 +57,8 @@ Limits of EGMK:
 
 Getting started with EGMK:
 
-  well you need an microcontroller, DC motor driver, and DC motor with an encoder.
-  My initial refrence design is using a 24V motor run at 12V with a 2880 line encoder.
+  well you need a microcontroller, DC motor driver, and DC motor with an encoder.
+  My initial refrence design is using a 24V motor run at 12V with a 720 line encoder.
   
   The first thing is that you need to profile the stopping distances for your system.
    This is done by the `EncVelProf` source code under firmware.
