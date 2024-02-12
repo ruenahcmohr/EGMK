@@ -31,7 +31,7 @@ How does EGMK work?
 But what about load?
 
   No. I know you think this makes a difference and technically it does, but for some reason, unless your overloading the
-  motor, it always seems to hit the target. ¯\_(ツ)_/¯ 
+  motor, it always seems to hit the target. ¯\\_(ツ)_/¯ 
 
 Where can I use EGMK?
 
@@ -75,6 +75,24 @@ Files on this repo:
 
   please be aware that numbers after the name of the directories do NOT imply better versions of the code,
   but different test and processes.
+
+EGMK developent:
+
+  There are a few weak points in the existing code. First is the ablility to hold a position. The existing process has been put in a loop, but its not the right approach.
+  
+  Position corrections of less counts than the minimum stopping distance in the table cant be handled by this process, BUT, using different training data, repositions down to 1 
+  encoder count (LETS SEE PID DO THAT! :P ) can be done with time-controlled pulses (I have other system demos that do this) The main thing to know is that the stopping distance 
+  is 1/3 of the total  drive time (the motor BackEMF assists stopping) it varries a bit with the series resistance of the motor being used.
+
+  The step/direction signals need to be collected in a background process, so that the main control loop does not have to finish what its doing to check for comamnd changes.
+
+  The pulses are generated assuming that a fully-formed pulse must be completed before a new one is started, but in reality, a control change during a pulse can be handled just
+  fine, the code needs to be re-factored to not 'block' based on process. (I'm trying to wrap my head around this right now)
+
+  
+
+  
+
 
 
 
