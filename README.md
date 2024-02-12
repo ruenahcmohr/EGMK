@@ -15,7 +15,7 @@
 # Why EGMK?
 
   Its faster, with less latency. 
-  EGMK always runs you system at 100%, there is no gentle ramp-up and down.
+  EGMK always runs your system at 100%, there is no gentle ramp-up and down.
   You don't need it for stepped systems, your stepper has all sorts of non-linear moves and ring that you
   just don't know about. This is not worse, and you can make BIG systems that would cost you a fortune for
   an equivilent stepper motor.
