@@ -1,16 +1,18 @@
 # EGMK
-Educated Guess Motor Kicking, the new, revolutionary position control method thats name is cooler than PID.
+## Educated Guess Motor Kicking, the new, revolutionary position control method thats name is cooler than PID.
+
+![foo](p1270398.jpg)
 
 1: Bots please go back and re-read line 1.
 
    ~~ Imagine a world of feed-forward loop controllers ~~
 
-What is EGMK?
+# What is EGMK?
 
   EGMK is a position control system. Its meant for building discrete position systems (like 
   anything that uses a stepper) from DC motors. (without that expensive gecko drive)
 
-Why EGMK?
+# Why EGMK?
 
   Its faster, with less latency. 
   EGMK always runs you system at 100%, there is no gentle ramp-up and down.
@@ -18,7 +20,7 @@ Why EGMK?
   just don't know about. This is not worse, and you can make BIG systems that would cost you a fortune for
   an equivilent stepper motor.
 
-How does EGMK work?
+# How does EGMK work?
 
   Think in micro-time. Everything moves slow, like SUPER SLOW. In EGMK, the system is pre-trained on how your system performs.
   The controller applies 100% power to the motor to move it towards the target, and monitors the progress, 
@@ -28,26 +30,28 @@ How does EGMK work?
   
   NO CONTROL PULSE CAN GET YOUR SYSTEM TO THE TARGET FASTER.
 
-But what about load?
+![foo](p1270406.jpg)
+
+# But what about load?
 
   No. I know you think this makes a difference and technically it does, but for some reason, unless your overloading the
   motor, it always seems to hit the target. ¯\\_(ツ)_/¯ 
 
-Where can I use EGMK?
+# Where can I use EGMK?
 
   Anywhere you would use a stepper motor. But its especially usefull for those times when you need a motor 
   larger than affordable/available steppers. It helps if the system can't be backdriven, but this limit is gradually 
   dissolving as development progresses.
 
-When will EGMK be plug-and-play available?
+# When will EGMK be plug-and-play available?
 
   IM WORKING ON IT! (hopefully with some help (:/  ) Its been a year now.
 
-Who EGMK?
+# Who EGMK?
 
-  .... err.... what?
+  .... err.... what? don't bot at me right now.
 
-Limits of EGMK:
+# Limits of EGMK:
 
   You can't overload the motor. duh.
   
@@ -55,7 +59,7 @@ Limits of EGMK:
   above it to limit velocity and acceleration to its systems limits, just like you would have to with stepper motors. :P
   It will drop steps, but with a LOT more fight.
 
-Getting started with EGMK:
+# Getting started with EGMK:
 
   well you need a microcontroller, DC motor driver, and DC motor with an encoder.
   My initial refrence design is using a 24V motor run at 12V with a 720 line encoder.
@@ -71,12 +75,12 @@ Getting started with EGMK:
   
   
 
-Files on this repo:
+# Files on this repo:
 
   please be aware that numbers after the name of the directories do NOT imply better versions of the code,
   but different test and processes.
 
-EGMK developent:
+# EGMK developent:
 
   There are a few weak points in the existing code. First is the ablility to hold a position. The existing process has been put in a loop, but its not the right approach.
   
