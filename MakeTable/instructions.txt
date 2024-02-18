@@ -1,0 +1,30 @@
+Approximite process.
+---------------------
+
+
+from the csv data from the velocity profiler (not 2):
+
+
+find a divider, use the approximite maximum hitspeed and scale it back to ~256 using a 2^n divider (2, 4, 8, 16, 32...)
+for example if your top speed was 30500, you could use a divider of 128 which will scale it 'close enough' 
+any under-scaling will be cut off by the system anyhow.
+
+
+make a new column that the post-target distance (stopPos - Hit)
+
+chart (XY, line chart) the that stop-distance with against the HitSpeed, using HitSpeed as X
+
+from the resulting squiggle, get some data points for the top of the trend
+
+add those points as addPoint() functions in the code.
+
+compile and run the program (gcc *.c  ./a.out)
+
+it will write you a table for the C program and also dump you some SVG data to take back into the spreadsheet.
+
+if you add an XY line chart to the same graph it should follow the top trend of the collected data.
+
+Put the C table in the servo code, "done'. 
+
+(this will get easier as more people use and evolve it)
+

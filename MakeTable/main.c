@@ -2,6 +2,8 @@
 #include "vect.h"
 
 
+#define divider 128.0
+
 int main(int argc, char** argv) {
   // local variables
   
@@ -14,27 +16,22 @@ int main(int argc, char** argv) {
   printf("Initializing table\n");
   initTable(&data);
   
-  printf("Adding points\n");
-  addPoint( &data,  0, 250 );
-  addPoint( &data,  220.0/8.0, 250 );
-  addPoint( &data,  240.0/8.0, 210 );
-  addPoint( &data,  260.0/8.0, 180 );
-  addPoint( &data,  280.0/8.0, 160 );
-  addPoint( &data,  300.0/8.0, 140 );
-  addPoint( &data,  320.0/8.0, 130 );
-  addPoint( &data,  340.0/8.0, 120 );
-  addPoint( &data,  360.0/8.0, 110 );
-  addPoint( &data,  380.0/8.0, 100 );
-  addPoint( &data,  400.0/8.0, 95  );
-  addPoint( &data,  440.0/8.0, 80 );
-  addPoint( &data,  480.0/8.0, 70 );
-  addPoint( &data,  540.0/8.0, 60 );
-  addPoint( &data,  600.0/8.0, 50 );
-  addPoint( &data,  800.0/8.0, 35 );
-  addPoint( &data, 1000.0/8.0, 25 );
-  addPoint( &data, 1200.0/8.0, 20 );
-  addPoint( &data, 1400.0/8.0, 15 );
-  addPoint( &data, 1600.0/8.0, 5 );
+  printf("Adding points - speed, stopping-distance\n");
+  addPoint( &data,   0,              64 );
+  addPoint( &data,   5999.0/divider, 64 );
+  addPoint( &data,   6000.0/divider, 56 );
+  addPoint( &data,   6500.0/divider, 48 );
+  addPoint( &data,   7000.0/divider, 42 );
+  addPoint( &data,   8000.0/divider, 32 );
+  addPoint( &data,   9000.0/divider, 26 );
+  addPoint( &data,  10000.0/divider, 22 );
+  addPoint( &data,  11000.0/divider, 18 );
+  addPoint( &data,  13000.0/divider, 12 );
+  addPoint( &data,  16000.0/divider, 8  );
+  addPoint( &data,  19000.0/divider, 6 );
+  addPoint( &data,  22000.0/divider, 4 );
+  addPoint( &data,  27000.0/divider, 2 );
+ 
   
   //dumpTable( &data );
   
@@ -44,7 +41,12 @@ int main(int argc, char** argv) {
     printf("%03d,", (int)getLevel(&data, i ));    
   }
   
-  printf("};\n");
+  printf("};\n\n");
+ 
+  for( i = 0; i < 256; i++ ) {
+    printf("%03d,%03f \n", (int)getLevel(&data, i ), i*divider);    
+  } 
+ 
  
   destroyTable(&data);
   
