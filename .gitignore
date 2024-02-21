@@ -1,0 +1,4 @@
+*.srec
+*.bin
+*.elf
+*.map
