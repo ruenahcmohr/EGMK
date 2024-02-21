@@ -108,7 +108,15 @@ void printNumDec16( uint16_t bv ) {
 
 }
 
+void printSignNumDec8( int16_t bv) {
+ if (bv < 0) {
+   USART_Transmit( '-' );
+   printNumDec8(-bv);
+ } else {
+   printNumDec8(bv);
+ }
 
+}
 
 void printNumDec8( uint8_t bv ) {
 

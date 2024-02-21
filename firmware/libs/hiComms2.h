@@ -14,6 +14,7 @@
   void printNumHex32     ( uint32_t v ) ;
   
   void printSignNumDec16( int16_t bv) ;
+  void printSignNumDec8(  int16_t bv) ;
   
   void USART_printstring ( char *data);
 
