@@ -57,24 +57,11 @@ what this should do:
 #include "avrcommon.h"
 #include "nopDelay.h"
 #include "hiComms2.h"
+#include "localsys.h"
  
 /*****************************| DEFINIATIONS |********************************/
  
 
- 
-#define OUTPUT             1
-#define INPUT              0
-
- 
-
-
-// power     is PB3
-// direction is PB2
-
- #define  MotorForward()  SetBit(2, PORTB) ;    SetBit(3, PORTB)    
- #define  MotorReverse()  ClearBit(2, PORTB);   SetBit(3, PORTB)  
- #define  MotorOff()      ClearBit(2, PORTB) ;  ClearBit(3, PORTB)  
- 
  
  
 /*****************************| VARIABLES |********************************/
@@ -116,36 +103,19 @@ void         speed_init   ( void );
 /****************************| CODE... |***********************************/
  
  
- uint8_t VLUT[256] = {
-  250,250,250,250,250,250,250,250,250,250,250,250,250,250,250,250,
-  250,250,250,250,250,250,250,250,250,250,250,250,242,226,210,198,
-  186,176,168,160,152,144,138,134,130,126,122,118,114,110,106,102,
-  99,97,95,92,89,86,83,80,78,76,74,72,70,68,67,66,
-  64,63,62,60,59,58,56,55,54,52,51,50,49,48,48,47,
-  47,46,45,45,44,44,43,42,42,41,41,40,39,39,38,38,
-  37,36,36,35,35,34,34,33,33,33,32,32,31,31,31,30,
-  30,29,29,29,28,28,27,27,27,26,26,25,25,25,24,24,
-  24,24,24,23,23,23,23,23,22,22,22,22,22,21,21,21,
-  21,21,20,20,20,20,20,19,19,19,19,19,18,18,18,18,
-  18,17,17,17,17,17,16,16,16,16,16,15,15,15,15,15,
-  14,14,13,13,13,12,12,11,11,11,10,10,9,9,9,8,
-  8,7,7,7,6,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
-};
  
 
 int main (void)  {  
   
   unsigned int targetHit, targetSpeed;
   unsigned int stopPos;
-  unsigned int target, step;
+  unsigned int target; //, step;
   unsigned int x, v;
   
   
   DDRB = (INPUT << PB0 | INPUT << PB1 |OUTPUT << PB2 |OUTPUT << PB3 |INPUT << PB4 |INPUT << PB5 |INPUT << PB6 |INPUT << PB7);
   DDRC = (INPUT << PC0 | INPUT << PC1 |INPUT << PC2 |INPUT << PC3 |INPUT << PC4 |INPUT << PC5 |INPUT << PC6 );
-  DDRD = (INPUT << PD0 | INPUT << PD1 |INPUT << PD2 |INPUT << PD3 |INPUT << PD4 |INPUT << PD5 |INPUT << PD6 |OUTPUT << PD7);        
+  DDRD = (INPUT << PD0 | INPUT << PD1 |INPUT << PD2 |INPUT << PD3 |INPUT << PD4 |INPUT << PD5 |INPUT << PD6 |INPUT << PD7);        
   
   PORTC = 0xFF ; // turn on pullups.      
   
@@ -160,7 +130,7 @@ int main (void)  {
   
 
   position = 0;
-  step     = 288; 
+//  step     = 288; 
   target   = 0;
   
   USART_printstring( "Run, Hit, HitSpeed, StopPos \n");
@@ -183,7 +153,7 @@ int main (void)  {
          x = position; 
          v = moveTicks; 
        sei();
-       v >>= 3;       // velocity scaled down to fit 8 bit table.
+       v >>= VELOCITYSCALE;       // velocity scaled down to fit 8 bit table.
        x += VLUT[v] ; // anticipate stop position              
      }
      targetHit   = position;   
@@ -226,6 +196,7 @@ int main (void)  {
 
 ISR(TIMER1_OVF_vect) {
   moveTicks = 60000;
+  direction = 0;
 }
 
 
@@ -278,11 +249,12 @@ void updatePos() {
   
   position += t;       // Update Position
 
-  if (direction == t) { // if the direction is the same
-    moveTicks = TCNT1;      
-  } else {
+  if ((direction == t) || (direction == 0)) { // if the direction is the same as last time *** important correction here ****
+    moveTicks = TCNT1;
+  } else  {
     moveTicks = 60000; // "0" if we changed direction and dont have a new reading yet.
-  }  
+    t = 0;             // set direction to zero. (average, we just turned around)
+  }
 
   TCNT1     = 0;
   direction = t;      	      

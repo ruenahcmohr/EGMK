@@ -1,19 +1,50 @@
 /******************************************************************************
-Title:    velocity profiler for EGMK
+Title:    encoder -> PWM
 Author:   rue_mohr
 Date:     Aug 19 2005
 Software: AVR-GCC 3.3 
-Hardware: atmega328
+Hardware: atmega32
   
+
+                 
++-------------------------------------+
+ |                          Sig Vd Gnd |
+ |  +---------+   5V O     PB0 [o o o] | 
+ |  | 7805  O |   Vd O     PB1 [o o o] | 
+ |  +---------+   V+ .     PB2 [o o o] 10 | -> dir
+ |                         PB3 [o o o] 12 | -> pwm
+ |                         PB4 [o o o] 11 | 
+ |                         PB5 [o o o] | 
+ |                         PB6 [o o o] | 
+ |                         PB7 [o o o] | 
+ |                         PA0 [o o o] | 
+ |                         PA1 [o o o] | 
+ |        +----------+     PA2 [o o o] | 
+ |        |O         |     PA3 [o o o] | 
+ |        |          |     PA4 [o o o] | 
+ |        |          |     PA5 [o o o] | 
+ |        |          |     PA6 [o o o] | 
+ |        |          |     PA7 [o o o] | 
+ |        |          |     PC7 [o o o] |
+ |        |          |     PC6 [o o o] |
+ |        |          |     PC5 [o o o] |
+ |        | ATMEGA32 |     PC4 [o o o] |
+ |        |          |     PC3 [o o o] |
+ |        |          |     PC2 [o o o] |
+ |        |          |     PC1 [o o o] A1 | <- down button (dir)
+ |        |          |     PC0 [o o o] A0 | <- up button (step)
+ |        |          |     PD7 [o o o] 7  | -> loop heartbeat
+ |        |          |     PD2 [o o o] 2  | <- channel A
+ |        |          |     PD3 [o o o] 3  | <- channel B 
+ |        |          |     PD4 [o o o] 4  |
+ |        |          |     PD5 [o o o] 5  |
+ |        +----------+     PD6 [o o o] 6  |
+ |      E.D.S BABYBOARD III               |
+ +-------------------------------------+
 
 
 what this should do:
-
-This performs position moves from 2 to 4000 lines and records the system performance.
-The goal is NOT to hit the target, its to find out what the stopping distances are,
-we dont really care what the origional move was, we care about the velocity, 
-The change in target is used to try to sample various system speeds.
-
+3000 line encoder, this shouls measeure the speed, in degrees/second
     
 *******************************************************************************/
  
@@ -26,25 +57,12 @@ The change in target is used to try to sample various system speeds.
 #include "avrcommon.h"
 #include "nopDelay.h"
 #include "hiComms2.h"
+#include "localsys.h"
  
 /*****************************| DEFINIATIONS |********************************/
  
 
- 
-#define OUTPUT             1
-#define INPUT              0
 
- 
-
-
-// power     is PB3
-// direction is PB2
-
- #define  MotorForward()  SetBit(2, PORTB) ;    SetBit(3, PORTB)    
- #define  MotorReverse()  ClearBit(2, PORTB);   SetBit(3, PORTB)  
- #define  MotorOff()      ClearBit(2, PORTB) ;  ClearBit(3, PORTB)  
- 
- 
  
 /*****************************| VARIABLES |********************************/
 
@@ -97,7 +115,7 @@ int main (void)  {
   
   DDRB = (INPUT << PB0 | INPUT << PB1 |OUTPUT << PB2 |OUTPUT << PB3 |INPUT << PB4 |INPUT << PB5 |INPUT << PB6 |INPUT << PB7);
   DDRC = (INPUT << PC0 | INPUT << PC1 |INPUT << PC2 |INPUT << PC3 |INPUT << PC4 |INPUT << PC5 |INPUT << PC6 );
-  DDRD = (INPUT << PD0 | INPUT << PD1 |INPUT << PD2 |INPUT << PD3 |INPUT << PD4 |INPUT << PD5 |INPUT << PD6 |OUTPUT << PD7);        
+  DDRD = (INPUT << PD0 | INPUT << PD1 |INPUT << PD2 |INPUT << PD3 |INPUT << PD4 |INPUT << PD5 |INPUT << PD6 |INPUT << PD7);        
   
   PORTC = 0xFF ; // turn on pullups.      
   
@@ -116,7 +134,7 @@ int main (void)  {
   
   USART_printstring( "Target, Hit, HitSpeed, StopPos, coastPos \n");
   
-  // sweep run position from 2 lines to 4000 lines.
+  // sweep run position from 18 lines to 7200 lines.
   
    while(target < 4000) {
    
@@ -140,11 +158,11 @@ int main (void)  {
      
      stopPos = position;
      
-     Delay(724637); // settle.2 seconds.
+     Delay(724637); // settle.  
      
      coastPos = position;
 
-     
+     // sleep 0.5 seconds
      printNumDec16( target );
      USART_printstring( ", ");
      printNumDec16( targetHit );
@@ -176,6 +194,7 @@ int main (void)  {
 
 ISR(TIMER1_OVF_vect) {
   moveTicks = 60000;
+  direction = 0;
 }
 
 
@@ -230,9 +249,12 @@ void updatePos() {
   
   position += t;       // Update Position
 
-  if (direction != t) { // if the direction is the same
+  if ((direction == t) || (direction == 0)) { // if the direction is the same as last time *** important correction here ****
+    moveTicks = TCNT1;
+  } else  {
     moveTicks = 60000; // "0" if we changed direction and dont have a new reading yet.
-  }  
+    t = 0;             // set direction to zero. (average, we just turned around)
+  }
 
   direction = t;      	      
   flag++;	

@@ -1,19 +1,50 @@
 /******************************************************************************
-Title:    EGMK profiler 2
+Title:    encoder -> PWM
 Author:   rue_mohr
 Date:     Aug 19 2005
 Software: AVR-GCC 3.3 
-Hardware: atmega328
+Hardware: atmega32
   
+
+                 
++-------------------------------------+
+ |                          Sig Vd Gnd |
+ |  +---------+   5V O     PB0 [o o o] | 
+ |  | 7805  O |   Vd O     PB1 [o o o] | 
+ |  +---------+   V+ .     PB2 [o o o] 10 | -> dir
+ |                         PB3 [o o o] 12 | -> pwm
+ |                         PB4 [o o o] 11 | 
+ |                         PB5 [o o o] | 
+ |                         PB6 [o o o] | 
+ |                         PB7 [o o o] | 
+ |                         PA0 [o o o] | 
+ |                         PA1 [o o o] | 
+ |        +----------+     PA2 [o o o] | 
+ |        |O         |     PA3 [o o o] | 
+ |        |          |     PA4 [o o o] | 
+ |        |          |     PA5 [o o o] | 
+ |        |          |     PA6 [o o o] | 
+ |        |          |     PA7 [o o o] | 
+ |        |          |     PC7 [o o o] |
+ |        |          |     PC6 [o o o] |
+ |        |          |     PC5 [o o o] |
+ |        | ATMEGA32 |     PC4 [o o o] |
+ |        |          |     PC3 [o o o] |
+ |        |          |     PC2 [o o o] |
+ |        |          |     PC1 [o o o] A1 | <- down button (dir)
+ |        |          |     PC0 [o o o] A0 | <- up button (step)
+ |        |          |     PD7 [o o o] 7  | -> loop heartbeat
+ |        |          |     PD2 [o o o] 2  | <- channel A
+ |        |          |     PD3 [o o o] 3  | <- channel B 
+ |        |          |     PD4 [o o o] 4  |
+ |        |          |     PD5 [o o o] 5  |
+ |        +----------+     PD6 [o o o] 6  |
+ |      E.D.S BABYBOARD III               |
+ +-------------------------------------+
 
 
 what this should do:
-
-mind misnmed variables (recycled code)
-This does 2880 samples of a move of 288 lines.
-This is part of checking sysstem repeatability/stability.
-
-
+3000 line encoder, this shouls measeure the speed, in degrees/second
     
 *******************************************************************************/
  
@@ -26,24 +57,9 @@ This is part of checking sysstem repeatability/stability.
 #include "avrcommon.h"
 #include "nopDelay.h"
 #include "hiComms2.h"
+#include "localsys.h"
  
 /*****************************| DEFINIATIONS |********************************/
- 
-
- 
-#define OUTPUT             1
-#define INPUT              0
-
- 
-
-
-// power     is PB3
-// direction is PB2
-
- #define  MotorForward()  SetBit(2, PORTB) ;    SetBit(3, PORTB)    
- #define  MotorReverse()  ClearBit(2, PORTB);   SetBit(3, PORTB)  
- #define  MotorOff()      ClearBit(2, PORTB) ;  ClearBit(3, PORTB)  
- 
  
  
 /*****************************| VARIABLES |********************************/
@@ -169,6 +185,7 @@ int main (void)  {
 
 ISR(TIMER1_OVF_vect) {
   moveTicks = 60000;
+  direction = 0;
 }
 
 
@@ -219,11 +236,12 @@ void updatePos() {
   
   position += t;       // Update Position
 
-  if (direction == t) { // if the direction is the same
-    moveTicks = TCNT1;      
-  } else {
+  if ((direction == t) || (direction == 0)) { // if the direction is the same as last time *** important correction here ****
+    moveTicks = TCNT1;
+  } else  {
     moveTicks = 60000; // "0" if we changed direction and dont have a new reading yet.
-  }  
+    t = 0;             // set direction to zero. (average, we just turned around)
+  }
 
   TCNT1     = 0;
   direction = t;      	      
