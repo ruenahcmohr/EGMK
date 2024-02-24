@@ -1,6 +1,6 @@
 /******************************************************************************
 Title:    EGMK DC stepped servo
-Author:   rue_mohr
+Author:   obfuscated_d / rue_mohr
 Date:     Aug 19 2005
 Software: AVR-GCC 3.3
 Hardware: atmega32
