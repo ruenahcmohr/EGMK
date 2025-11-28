@@ -93,7 +93,16 @@
   The pulses are generated assuming that a fully-formed pulse must be completed before a new one is started, but in reality, a control change during a pulse can be handled just
   fine, the code needs to be re-factored to not 'block' based on process. (I'm trying to wrap my head around this right now)
 
-  
+# EGMK videos:
+
+
+[![INTRODUCING](https://img.youtube.com/vi/kylXSet6nuA/0.jpg)]
+(https://www.youtube.com/watch?v=kylXSet6nuA)
+
+
+[![DEMO](https://img.youtube.com/vi/2lVbM1rRd-E/0.jpg)]
+(https://www.youtube.com/watch?v=2lVbM1rRd-E)
+
 
   
 
